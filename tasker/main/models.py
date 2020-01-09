@@ -1,24 +1,29 @@
 import datetime
-
-from django.contrib.auth.models import User
+from django.contrib.auth.models import  AbstractUser
 from django.db import models
 from django.utils import timezone
 
 
 # USER SECTION
-class UserProfile(models.Model):
+class AdvancedUser(AbstractUser):
     """User additional information"""
-    user = models.OneToOneField(User, on_delete=models.PROTECT)
     profile_image = models.ImageField(upload_to='user/profile_image', default='img/default_image.jpg')
+
+    is_activated = models.BooleanField(default=True, db_index=True,
+                                       verbose_name='Прошел активацию')
+    send_messages = models.BooleanField(default=True,
+                                        verbose_name='Слать оповещения о новых комментариях?')
+
+    class Meta(AbstractUser.Meta):
+        pass
 
 
 # TASKBOARD SECTION
 class MainTaskBoard(models.Model):
     board_name = models.CharField(max_length=50, verbose_name='Назови доску задач', default='Task board')
-    creator = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Автор')
+    creator = models.OneToOneField(AdvancedUser, on_delete=models.CASCADE, verbose_name='Автор')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
 
-    members = models.ManyToManyField(User, related_name='friends')
 
     class Meta:
         verbose_name = 'Доска задач'
@@ -35,8 +40,9 @@ class TaskInfo(models.Model):
     main_board = models.ForeignKey(MainTaskBoard, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, verbose_name='Задача')
     description = models.TextField(max_length=2000, verbose_name='Дополнительное описание задачи')
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
+    author = models.ForeignKey(AdvancedUser, on_delete=models.CASCADE, verbose_name='Автор')
     t_duration = models.CharField(choices=duration, max_length=10)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
 
     class Meta:
         verbose_name = 'Задача'
