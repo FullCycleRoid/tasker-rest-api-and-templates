@@ -1,81 +1,59 @@
+import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
 
 # USER SECTION
-
-# class User():
-#     """New user model"""
-#     pass
-
 class UserProfile(models.Model):
     """User additional information"""
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.PROTECT)
     profile_image = models.ImageField(upload_to='user/profile_image', default='img/default_image.jpg')
-    name = models.CharField(max_length=50)
 
 
 # TASKBOARD SECTION
+class MainTaskBoard(models.Model):
+    board_name = models.CharField(max_length=50, verbose_name='Назови доску задач', default='Task board')
+    creator = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Автор')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
+
+    members = models.ManyToManyField(User, related_name='friends')
+
+    class Meta:
+        verbose_name = 'Доска задач'
+        verbose_name_plural = 'Доски задач'
 
 
-class Goal(models.Model):
-    """User goals and preferred accomplishments"""
-    title = models.CharField(max_length=50)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    description = models.TextField(max_length=2000)
-    created_at = models.DateTimeField(editable=False)
-    last_modified = models.DateTimeField()
+class TaskInfo(models.Model):
+    duration = (
+        ('day', 'day'),
+        ('week', 'week'),
+        ('long', 'long')
+    )
 
-    def save(self, *args, **kwargs):
-        """On save, update timestamps"""
-        if not self.pk:
-            self.created_at = timezone.now()
-        self.last_modified = timezone.now()
-        return super().save(*args, **kwargs)
+    main_board = models.ForeignKey(MainTaskBoard, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50, verbose_name='Задача')
+    description = models.TextField(max_length=2000, verbose_name='Дополнительное описание задачи')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
+    t_duration = models.CharField(choices=duration, max_length=10)
 
-
-state = {
-    'x': 'red',
-    'done': 'green',
-    'in_progress': 'purple'
-}
+    class Meta:
+        verbose_name = 'Задача'
+        verbose_name_plural = 'Задачи'
 
 
 class DailyTask(models.Model):
-    """Daily task"""
-    goals = models.ForeignKey('Goal', on_delete=models.PROTECT)
-    condition = models.CharField(max_length=1, choices=state, default=state['x'])
+    status = (
+         ('done', 'done'),
+         ('undone', 'undone'),
+         ('in_progress', 'in_progress')
+    )
 
-    def save(self, *args, **kwargs):
-        """On save, update timestamps"""
-        if not self.pk:
-            self.created_at = timezone.now()
-        self.last_modified = timezone.now()
-        return super().save(*args, **kwargs)
+    task_info = models.ForeignKey(TaskInfo, on_delete=models.CASCADE)
+    t_status = models.CharField(choices=status, default=status[1], max_length=50)
+    created_at = models.DateField(auto_now_add=True, editable=False)
 
-
-class Note(models.Model):
-    """Useful redactor for notes"""
-    name = models.CharField(max_length=20)
-    body = models.TextField()
-
-
-# RATING SYSTEM SECTION
-class Rating(models.Model):
-    """Implementation of rating system model"""
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    rating = models.IntegerField()
-    month_achievement = models.CharField(max_length=50)
-
-
-# COMMENTS SECTION
-class Comment(models.Model):
-    text = models.CharField(max_length=500)
-    taskboard = models.ForeignKey('TaskBoard', on_delete=models.CASCADE)
-
-
-# SCHEDULE SECTION
-class Schedule():
-    """"""
-    pass
+    class Meta:
+        verbose_name = 'Отметка'
+        verbose_name_plural = 'Отметка'
