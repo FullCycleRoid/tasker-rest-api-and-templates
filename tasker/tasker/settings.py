@@ -136,3 +136,5 @@ CRONJOBS = [
     ('1 * * * *', 'main.cron.my_scheduled_job'),
     ('1 * * * *', 'tasker.cron.my_scheduled_job'),
 ]
+
+AUTH_USER_MODEL = 'main.AdvancedUser'

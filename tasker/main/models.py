@@ -22,12 +22,16 @@ class AdvancedUser(AbstractUser):
 class MainTaskBoard(models.Model):
     board_name = models.CharField(max_length=50, verbose_name='Назови доску задач', default='Task board')
     creator = models.OneToOneField(AdvancedUser, on_delete=models.CASCADE, verbose_name='Автор')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
-
+    created_at = models.DateField(editable=False, verbose_name='Создано')
 
     class Meta:
         verbose_name = 'Доска задач'
         verbose_name_plural = 'Доски задач'
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.created_at = datetime.date.today()
+        return super().save(*args, **kwargs)
 
 
 class TaskInfo(models.Model):
@@ -42,14 +46,19 @@ class TaskInfo(models.Model):
     description = models.TextField(max_length=2000, verbose_name='Дополнительное описание задачи')
     author = models.ForeignKey(AdvancedUser, on_delete=models.CASCADE, verbose_name='Автор')
     t_duration = models.CharField(choices=duration, max_length=10)
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
+    created_at = models.DateField(editable=False, verbose_name='Создано')
 
     class Meta:
         verbose_name = 'Задача'
         verbose_name_plural = 'Задачи'
 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.created_at = datetime.date.today()
+        return super().save(*args, **kwargs)
 
-class DailyTask(models.Model):
+
+class Mark(models.Model):
     status = (
          ('done', 'done'),
          ('undone', 'undone'),
@@ -58,8 +67,18 @@ class DailyTask(models.Model):
 
     task_info = models.ForeignKey(TaskInfo, on_delete=models.CASCADE)
     t_status = models.CharField(choices=status, default=status[1], max_length=50)
-    created_at = models.DateField(auto_now_add=True, editable=False)
+    created_at = models.DateField(editable=False)
+    end_date = models.DateField(editable=False, verbose_name='Жизненный цикл')
 
     class Meta:
         verbose_name = 'Отметка'
-        verbose_name_plural = 'Отметка'
+        verbose_name_plural = 'Отметки'
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.created_at = datetime.date.today()
+            if self.task_info.t_duration == 'day':
+                self.life_period = datetime.date.today() + datetime.timedelta(days=1)
+            elif self.task_info.t_duration == 'week':
+                self.life_period = datetime.date.today() + datetime.timedelta(days=7)
+        return super().save(*args, **kwargs)
