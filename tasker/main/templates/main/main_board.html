@@ -6,61 +6,17 @@
 
 {% block content %}
 
-<table class="table ">
-    <tbody class="">
-
+<table class="table">
+    <tbody>
             <tr>
                 <th>Задачи</th>
                 <th>{{ month }}</th>
                 {% for day in days %}
                     <td>{{ forloop.counter }}</td>
                 {% endfor %}
-
             </tr>
-            {% if main %}
-                {% for member in main.members.all %}
-                <th>{{ member.username }}</th>
-                <tr>
 
-                 <th class='vericaltext day' rowspan="{{ task|task_length:'day'}}">
-                 Ежедневные</th>
-                {% for tsk in task %}
-                    {% if tsk.t_duration == 'day' %}
-                    <th>{{ tsk.name }}</th>
-                    {% for dt in tsk.dailytask_set.all %}
-                    <td class="{{ dt.t_status }}"> </td>
-                {% endfor %}
-            </tr>
-                    {% endif %}
-                {% endfor %}
-            <tr>
 
-                 <th class='vericaltext week' rowspan="{{ task|task_length:'week'}}">
-                    Еженедельные </th>
-                    {% for tsk in task %}
-                        {% if tsk.t_duration == 'week' %}
-                            <th>{{ tsk.name }}</th>
-                            {% for dt in tsk.dailytask_set.all %}
-                            <td class="{{ dt.t_status }}"> </td>
-                            {% endfor %}
-             </tr>
-                        {% endif %}
-                    {% endfor %}
-
-            <tr>
-            <th class='vericaltext long' rowspan="{{ task|task_length:'long'}}">
-             Долгосрочные </th>
-            {% for tsk in task %}
-                {% if tsk.t_duration == 'long' %}
-                    <th>{{ tsk.name }}</th>
-                    {% for dt in tsk.dailytask_set.all %}
-                    <td class="{{ dt.t_status }}"> </td>
-                    {% endfor %}
-            </tr>
-                    {% endif %}
-                {% endfor %}
-                {% endfor %}
-        {% endif %}
     </tbody>
 </table>
 

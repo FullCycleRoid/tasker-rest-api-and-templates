@@ -51,6 +51,7 @@ class TaskInfo(models.Model):
     class Meta:
         verbose_name = 'Задача'
         verbose_name_plural = 'Задачи'
+        ordering = ['author', 't_duration']
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -78,7 +79,7 @@ class Mark(models.Model):
         if not self.pk:
             self.created_at = datetime.date.today()
             if self.task_info.t_duration == 'day':
-                self.life_period = datetime.date.today() + datetime.timedelta(days=1)
+                self.end_date = datetime.date.today() + datetime.timedelta(days=1)
             elif self.task_info.t_duration == 'week':
-                self.life_period = datetime.date.today() + datetime.timedelta(days=7)
+                self.end_date = datetime.date.today() + datetime.timedelta(days=7)
         return super().save(*args, **kwargs)

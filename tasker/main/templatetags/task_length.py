@@ -10,4 +10,5 @@ def task_length(queryset, arg):
             length += 1
     return length
 
+
 register.filter('task_length', task_length)
