@@ -1,37 +1,23 @@
 import datetime
 from django.shortcuts import render
 from .calendar import days_in_month
-from .models import TaskInfo, MainTaskBoard
+from .models import TaskInfo, MainTaskBoard, AdvancedUser
+
+
+
 
 
 def main_board(request):
-    month = datetime.datetime.now().strftime('%B')
-    number_of_days = days_in_month(month)
+    days = days_in_month(datetime.datetime.now().strftime('%B'))
 
-    all_user_task = TaskInfo.objects.filter(author=request.user.pk)
-    first_user_task = all_user_task.first()
+    user_bord_pk = AdvancedUser.objects.get(pk=request.user.pk).board.pk
+    main_board = MainTaskBoard.objects.get(pk=user_bord_pk)
+    board_users = main_board.advanceduser_set.all()
 
-    user_main_board_pk = first_user_task.main_board.pk
-    main_board_obj = MainTaskBoard.objects.get(pk=user_main_board_pk)
+    users_pk = [pk.pk for pk in board_users]
+    all_tasks = TaskInfo.objects.filter(author__in=users_pk)
 
-    main_board_authors_pk = list(set(main_board_obj.taskinfo_set.all().
-                                  values_list('author', flat=True)))
-
-    all_board_tasks = TaskInfo.objects.filter(author__in=main_board_authors_pk)
-
-    main_board = MainTaskBoard.objects.all()
-    for item in main_board:
-        if item
-            my_main_board = item.taskinfo_set.filter(author=request.user.pk)
-
-    print('my_board',my_main_board)
-
-    duration = {
-        'day': 'day',
-        'week': 'week'
-    }
-
-
-    context = {'days': range(number_of_days), 'all_user_task': all_user_task, 'month': month,
-               'first_user_task': first_user_task, 'all_board_tasks': all_board_tasks, 'duration': duration}
+    print(all_tasks)
+    context = {'board_users': board_users, 'main_board': main_board,
+               'days': range(days), 'all_tasks': all_tasks}
     return render(request, 'main/main_board.html', context)

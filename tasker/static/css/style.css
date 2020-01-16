@@ -50,9 +50,26 @@
     font-weight: bold;
     text-align: center;
 }
+
+.UserTable
+{
+    display:  table;
+    width:auto;
+    background-color:#eee;
+    border:1px solid  #666666;
+    border-spacing:5px;
+    margin: 30px;
+}
+
 .Row
 {
     display: table-row;
+}
+
+.Col
+{
+    display: table-column;
+
 }
 .Cell
 {
@@ -61,4 +78,25 @@
     border-width: thin;
     padding-left: 5px;
     padding-right: 5px;
+}
+
+.DivTableBody
+{
+	display: table-row-group;
+}
+
+.mytable {
+  display: table;
+}
+.myrow {
+  display: table-row;
+}
+.mycell {
+  display: table-cell;
+}
+.Column {
+  display: table-column;
+}
+.column2 {
+  display: table-column;
 }

@@ -13,6 +13,7 @@ class AdvancedUser(AbstractUser):
                                        verbose_name='Прошел активацию')
     send_messages = models.BooleanField(default=True,
                                         verbose_name='Слать оповещения о новых комментариях?')
+    board = models.ForeignKey('MainTaskBoard', on_delete=models.CASCADE, blank=True)
 
     class Meta(AbstractUser.Meta):
         pass
@@ -35,11 +36,12 @@ class MainTaskBoard(models.Model):
 
 
 class TaskInfo(models.Model):
-    duration = (
+    duration = {
+        ('single', 'single'),
         ('day', 'day'),
         ('week', 'week'),
         ('long', 'long')
-    )
+    }
 
     main_board = models.ForeignKey(MainTaskBoard, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, verbose_name='Задача')
@@ -80,6 +82,10 @@ class Mark(models.Model):
             self.created_at = datetime.date.today()
             if self.task_info.t_duration == 'day':
                 self.end_date = datetime.date.today() + datetime.timedelta(days=1)
+            elif self.task_info.t_duration == 'single':
+                self.end_date = datetime.date.today() + datetime.timedelta(days=0)
             elif self.task_info.t_duration == 'week':
                 self.end_date = datetime.date.today() + datetime.timedelta(days=7)
+            else:
+                self.end_date = datetime.date.today() + datetime.timedelta(days=31)
         return super().save(*args, **kwargs)

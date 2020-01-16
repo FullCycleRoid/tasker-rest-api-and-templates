@@ -6,18 +6,50 @@
 
 {% block content %}
 
-<table class="table">
-    <tbody>
-            <tr>
-                <th>Задачи</th>
-                <th>{{ month }}</th>
-                {% for day in days %}
-                    <td>{{ forloop.counter }}</td>
-                {% endfor %}
-            </tr>
+<div class="container">
 
+    {% for user in board_users %}
 
-    </tbody>
-</table>
+    <div class="UserTable">
 
+        <h3>{{ user }}</h3>
+
+        <div class="row">
+            <div class="col-md-1">
+                <p>blank</p>
+            </div>
+            <div class="col-md-2">
+                <p>blank</p>
+            </div>
+
+            <div class="col-md-9">
+                <div class="Cell">
+                    {% for day in days %}
+                        {{ day }}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+                <div class="col-md-1">
+                    <p>blank</p>
+                </div>
+
+                <div class="col-md-2">
+                    {% for task in all_tasks %}
+                        {{ task }}
+                    {% endfor %}
+                </div>
+
+                <div class="col-md-9">
+                    <div class="Cell">
+
+                    </div>
+                </div>
+        </div>
+    </div>
+
+    {% endfor %}
+    </div>
 {% endblock %}
