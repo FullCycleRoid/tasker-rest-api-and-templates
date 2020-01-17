@@ -5,51 +5,30 @@
 {% block title %} Main board {% endblock %}
 
 {% block content %}
+{% for user in board_users %}
+<h3>{{ user.username }}</h3>
+<table class="table">
+    <tr><th>Продолжительность</th><th>Задачи</th>
+        {% for day in days %}
+        <td>{{ day }}</td>
+        {% endfor %}
+    </tr>
 
-<div class="container">
-
-    {% for user in board_users %}
-
-    <div class="UserTable">
-
-        <h3>{{ user }}</h3>
-
-        <div class="row">
-            <div class="col-md-1">
-                <p>blank</p>
-            </div>
-            <div class="col-md-2">
-                <p>blank</p>
-            </div>
-
-            <div class="col-md-9">
-                <div class="Cell">
-                    {% for day in days %}
-                        {{ day }}
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-                <div class="col-md-1">
-                    <p>blank</p>
-                </div>
-
-                <div class="col-md-2">
-                    {% for task in all_tasks %}
-                        {{ task }}
-                    {% endfor %}
-                </div>
-
-                <div class="col-md-9">
-                    <div class="Cell">
-
-                    </div>
-                </div>
-        </div>
-    </div>
-
+    {% for key,value in tasks_by_user.items %}
+    {% for task in value %}
+    {% if task.author.pk == user.pk %}
+    <tr>
+        <th rowspan="">{{ task.t_duration }}</th>
+        <th>{{ task }}</th>
+        {% for day in days %}
+        <td></td>
+        {%endfor%}
+    </tr>
+    {% endif %}
     {% endfor %}
-    </div>
+    {% endfor %}
+
+</table>
+{% endfor %}
+
 {% endblock %}

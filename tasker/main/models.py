@@ -37,15 +37,15 @@ class MainTaskBoard(models.Model):
 
 class TaskInfo(models.Model):
     duration = {
-        ('single', 'single'),
-        ('day', 'day'),
-        ('week', 'week'),
-        ('long', 'long')
+        ('1000', 'Бессрочные'),
+        ('1', 'Ежедневные'),
+        ('7', 'Еженедельные'),
+        ('30', 'Долгосрочные')
     }
 
     main_board = models.ForeignKey(MainTaskBoard, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, verbose_name='Задача')
-    description = models.TextField(max_length=2000, verbose_name='Дополнительное описание задачи')
+    description = models.TextField(max_length=2000, verbose_name='Дополнительное описание задачи', blank=True)
     author = models.ForeignKey(AdvancedUser, on_delete=models.CASCADE, verbose_name='Автор')
     t_duration = models.CharField(choices=duration, max_length=10)
     created_at = models.DateField(editable=False, verbose_name='Создано')
@@ -53,12 +53,15 @@ class TaskInfo(models.Model):
     class Meta:
         verbose_name = 'Задача'
         verbose_name_plural = 'Задачи'
-        ordering = ['author', 't_duration']
+        ordering = ['author', 't_duration' ]
 
     def save(self, *args, **kwargs):
         if not self.pk:
             self.created_at = datetime.date.today()
         return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 
 class Mark(models.Model):
@@ -80,11 +83,11 @@ class Mark(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.created_at = datetime.date.today()
-            if self.task_info.t_duration == 'day':
+            if self.task_info.t_duration == '1':
                 self.end_date = datetime.date.today() + datetime.timedelta(days=1)
-            elif self.task_info.t_duration == 'single':
+            elif self.task_info.t_duration == '0':
                 self.end_date = datetime.date.today() + datetime.timedelta(days=0)
-            elif self.task_info.t_duration == 'week':
+            elif self.task_info.t_duration == '7':
                 self.end_date = datetime.date.today() + datetime.timedelta(days=7)
             else:
                 self.end_date = datetime.date.today() + datetime.timedelta(days=31)

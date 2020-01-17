@@ -1,102 +1,62 @@
+html, body
+{
+    margin:0;
+    padding:0;
 
+}
 
 .undone{
     border: 1px solid red;
     background-color: red;
 }
 
-.done {
+.done
+{
     border: 1px solid green;
     color: red;
 }
 
-.in_progress{
+.in_progress
+{
     border: 1px solid purple;
     color: red;
 }
 
-.vericaltext {
+.vericaltext
+{
     writing-mode:tb-rl;
       transform: rotate(180deg);
-
 }
 
-.day {
+.day
+{
     background-color:#90EE90;
 }
 
-.week {
+.week
+{
     background-color:#b19cd9;
 }
 
-.long {
+.long
+{
     background-color: #ADD8E6;
 }
 
-.Table
+
+
+
+th, td
 {
-    display: table;
-}
-.Title
-{
-    display: table-caption;
-    text-align: center;
-    font-weight: bold;
-    font-size: larger;
-}
-.Heading
-{
-    display: table-row;
-    font-weight: bold;
-    text-align: center;
+    border: 1px solid black;
 }
 
-.UserTable
+td
 {
-    display:  table;
-    width:auto;
-    background-color:#eee;
-    border:1px solid  #666666;
-    border-spacing:5px;
-    margin: 30px;
+width:3%;
 }
 
-.Row
+ tr:nth-child(even)
 {
-    display: table-row;
-}
-
-.Col
-{
-    display: table-column;
-
-}
-.Cell
-{
-    display: table-cell;
-    border: solid;
-    border-width: thin;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
-.DivTableBody
-{
-	display: table-row-group;
-}
-
-.mytable {
-  display: table;
-}
-.myrow {
-  display: table-row;
-}
-.mycell {
-  display: table-cell;
-}
-.Column {
-  display: table-column;
-}
-.column2 {
-  display: table-column;
+    background-color:#f0f0f0;
 }
