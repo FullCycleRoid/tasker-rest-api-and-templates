@@ -92,3 +92,6 @@ class Mark(models.Model):
             else:
                 self.end_date = datetime.date.today() + datetime.timedelta(days=31)
         return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.task_info.name}-{self.created_at}'

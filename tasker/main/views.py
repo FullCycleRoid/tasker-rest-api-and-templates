@@ -1,6 +1,8 @@
 import datetime
 import calendar
 from django.shortcuts import render
+
+from .forms import TaskForm
 from .models import TaskInfo, MainTaskBoard, AdvancedUser, Mark
 
 
@@ -26,12 +28,13 @@ def main_board(request):
     for pk in users_pk:
         tasks_by_user[str(pk)] = TaskInfo.objects.filter(author=pk).\
             extra(select={'t_duration': 'CAST(t_duration AS INTEGER)'}).order_by('t_duration')
-
-    exact_user_task_marks = Mark.objects.filter(task_info__in)
-
+    if request.method == 'POST':
+        pass
+    else:
+        form = TaskForm()
 
 
     context = {'board_users': board_users, 'main_board': main_board,
-               'days': month_days(), 'tasks_by_user': tasks_by_user}
+               'days': range(month_days()), 'tasks_by_user': tasks_by_user, 'form':form}
 
     return render(request, 'main/main_board.html', context)

@@ -5,6 +5,7 @@
 {% block title %} Main board {% endblock %}
 
 {% block content %}
+
 {% for user in board_users %}
 <h3>{{ user.username }}</h3>
 <table class="table">
@@ -16,17 +17,32 @@
 
     {% for key,value in tasks_by_user.items %}
     {% for task in value %}
-    {% if task.author.pk == user.pk %}
-    <tr>
-        <th rowspan="">{{ task.t_duration }}</th>
-        <th>{{ task }}</th>
-        {% for day in days %}
-        <td></td>
-        {%endfor%}
-    </tr>
-    {% endif %}
+        {% if task.author.pk == user.pk %}
+        <tr>
+            <th rowspan="">{{ task.t_duration }}</th>
+            <th>{{ task }}</th>
+                {% for day in days%}
+                        {% for mark in task.mark_set.all %}
+                    {% with mark.created_at|date:"d" as mrk %}
+                    {% if day == mrk %}
+                        <td>1</td>
+                    {% else %}
+                        <td>None</td>
+                    {% endif %}
+                    {% endwith %}
+                {% endfor %}
+            {% endfor %}
+        </tr>
+        {% endif %}
     {% endfor %}
     {% endfor %}
+                <th></th>
+            <th><form method="POST">
+                {% csrf_token %}
+                {% bootstrap_form form layout='horizontal' %}
+                {% buttons submit='Добавить' %}{% endbuttons%}
+            </form></th>
+            <td></td>
 
 </table>
 {% endfor %}
