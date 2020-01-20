@@ -6,45 +6,52 @@
 
 {% block content %}
 
-{% for user in board_users %}
-<h3>{{ user.username }}</h3>
-<table class="table">
-    <tr><th>Продолжительность</th><th>Задачи</th>
-        {% for day in days %}
-        <td>{{ day }}</td>
-        {% endfor %}
-    </tr>
+    {% for usr in board_users %}
 
-    {% for key,value in tasks_by_user.items %}
-    {% for task in value %}
-        {% if task.author.pk == user.pk %}
-        <tr>
-            <th rowspan="">{{ task.t_duration }}</th>
-            <th>{{ task }}</th>
-                {% for day in days%}
-                        {% for mark in task.mark_set.all %}
-                    {% with mark.created_at|date:"d" as mrk %}
-                    {% if day == mrk %}
-                        <td>1</td>
-                    {% else %}
-                        <td>None</td>
-                    {% endif %}
-                    {% endwith %}
+    <h3>{{ usr.username }}</h3>
+    <table class="table">
+            <tr>
+                <th>Продолжительность</th><th>Задачи</th>
+                {% for day in days %}
+                <td>{{ day }}</td>
                 {% endfor %}
-            {% endfor %}
+            </tr>
+
+        {% for task in usr.taskinfo_set.all %}
+        {% if task.t_duration != '1000'%}
+            <tr>
+                <th rowspan="" class="">{{ task.get_t_duration_display }}</th>
+
+                <th>{{ task }}</th>
+                {% for day in days %}
+                {% for mark in task.mark_set.all%}
+                {% if day|slugify == mark.created_at|date:'d' %}
+                <td class="undone">
+                    <form method="post">
+                        
+                    </form>
+                </td>
+                {% else %}
+                <td class="none"></td>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+            </tr>
+        {% endif %}
+        {% endfor %}
+
+        {% if user.is_authenticated and usr.username == user.username  %}
+        <tr>
+            <th colspan="{{month|add:'2'}}">
+            Добавить задачу
+            <form method="post">
+                {% csrf_token %}
+                {% bootstrap_form form layout='vertical'%}
+                {% buttons submit='Добавить'%}{% endbuttons %}
+            </form>
+            </th>
         </tr>
         {% endif %}
+    </table>
     {% endfor %}
-    {% endfor %}
-                <th></th>
-            <th><form method="POST">
-                {% csrf_token %}
-                {% bootstrap_form form layout='horizontal' %}
-                {% buttons submit='Добавить' %}{% endbuttons%}
-            </form></th>
-            <td></td>
-
-</table>
-{% endfor %}
-
 {% endblock %}

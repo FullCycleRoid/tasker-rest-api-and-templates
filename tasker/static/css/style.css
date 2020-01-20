@@ -5,6 +5,13 @@ html, body
 
 }
 
+.none
+{
+    background-color: white;
+    border: 1px solid black;
+}
+
+
 .undone{
     border: 1px solid red;
     background-color: red;
@@ -43,14 +50,27 @@ html, body
     background-color: #ADD8E6;
 }
 
+h3
+{
+    margin-top:50px;
+}
+
 th, td
 {
     border: 1px solid black;
+    height:auto;
+
+}
+
+th:nth-child(2)
+{
+    min-width:25%;
+    max-width:30%;
 }
 
 td
 {
-width:3%;
+    width:3%;
 }
 
  tr:nth-child(even)

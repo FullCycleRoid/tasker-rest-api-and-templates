@@ -1,13 +1,12 @@
 import datetime
 import calendar
-from django.shortcuts import render
+
+from django.contrib import messages
+from django.db.models import Q, Count
+from django.shortcuts import render, redirect
 
 from .forms import TaskForm
 from .models import TaskInfo, MainTaskBoard, AdvancedUser, Mark
-
-
-start_date = datetime.datetime.now().year
-end_date = datetime.datetime.now().year + 1
 
 
 def month_days():
@@ -16,8 +15,24 @@ def month_days():
     return calendar.monthrange(int(y), int(m[1]))[1]
 
 
-def main_board(request):
+def current_month_days():
+    start_month = datetime.datetime.today().replace(day=1)
+    date_list = []
+    days = 0
+    m = datetime.datetime.now().strftime('%m')
+    y = datetime.datetime.now().strftime('%Y')
+    for item in range(calendar.monthrange(int(y), int(m[1]))[1]):
+        date_list.append(start_month + datetime.timedelta(days=days))
+        days += 1
+    return date_list
 
+
+def main_board(request):
+    user_count_tasks = TaskInfo.objects.filter(author=request.user.pk).aggregate(
+                                                Ежедневные=Count('pk', filter=Q(t_duration='1')),
+                                                Еженедельные=Count('pk', filter=Q(t_duration='7')),
+                                                Долгосрочные=Count('pk', filter=Q(t_duration='30')),
+                                               )
     user_bord_pk = AdvancedUser.objects.get(pk=request.user.pk).board.pk
     main_board = MainTaskBoard.objects.get(pk=user_bord_pk)
     board_users = main_board.advanceduser_set.all()
@@ -28,13 +43,23 @@ def main_board(request):
     for pk in users_pk:
         tasks_by_user[str(pk)] = TaskInfo.objects.filter(author=pk).\
             extra(select={'t_duration': 'CAST(t_duration AS INTEGER)'}).order_by('t_duration')
+
+    tasks = TaskInfo.objects.filter(author=request.user.pk)
     if request.method == 'POST':
-        pass
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.SUCCESS,
+                                 'Новая задача добавлена')
+            return redirect('main:main_board')
+        else:
+            messages.add_message(request, messages.ERROR,
+                                 'Какой то косяк. Сделай все как надо')
+            return redirect('main:main_board')
     else:
-        form = TaskForm()
+        form = TaskForm(initial={'author': request.user.pk, 'main_board': main_board })
 
-
-    context = {'board_users': board_users, 'main_board': main_board,
-               'days': range(month_days()), 'tasks_by_user': tasks_by_user, 'form':form}
+    context = {'board_users': board_users, 'main_board': main_board, 'month': month_days(),'days': current_month_days,
+               'utasks': tasks, 'form': form, 'user_count_tasks': user_count_tasks}
 
     return render(request, 'main/main_board.html', context)

@@ -44,10 +44,10 @@ class TaskInfo(models.Model):
     }
 
     main_board = models.ForeignKey(MainTaskBoard, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50, verbose_name='Задача')
+    name = models.CharField(max_length=50, verbose_name='Название')
     description = models.TextField(max_length=2000, verbose_name='Дополнительное описание задачи', blank=True)
     author = models.ForeignKey(AdvancedUser, on_delete=models.CASCADE, verbose_name='Автор')
-    t_duration = models.CharField(choices=duration, max_length=10)
+    t_duration = models.CharField(choices=duration, max_length=10, verbose_name='Длительность')
     created_at = models.DateField(editable=False, verbose_name='Создано')
 
     class Meta:
