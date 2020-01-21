@@ -9,8 +9,11 @@
 
 <header>
     <div class="inline">
-        {% bootstrap_form adduser_form layout='horizontal' %}
-        {% buttons submit='Добавить участника' %}{% endbuttons %}
+        <form method="POST">
+            {% csrf_token %}
+            {% bootstrap_form adduser_form layout='horizontal' %}
+            {% buttons submit='add new user' %}{% endbuttons %}
+        </form>
     </div>
 </header>
 
@@ -70,7 +73,7 @@
             <form method="post">
                 {% csrf_token %}
                 {% bootstrap_form form layout='vertical' %}
-                {% buttons submit='Добавить'%}{% endbuttons %}
+                {% buttons submit='Добавить' %}{% endbuttons %}
             </form>
             </th>
         </tr>

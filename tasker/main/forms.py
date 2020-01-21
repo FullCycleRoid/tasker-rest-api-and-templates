@@ -1,5 +1,4 @@
 from django import forms
-
 from main.models import TaskInfo, Mark
 
 
@@ -12,11 +11,10 @@ class TaskForm(forms.ModelForm):
 
 class MarkForm(forms.ModelForm):
 
-
     class Meta:
         model = Mark
         fields = {'t_status'}
 
 
 class AddUserForm(forms.Form):
-    email = forms.EmailField()
+    email = forms.EmailField(label='Enter email of your friend to add him')

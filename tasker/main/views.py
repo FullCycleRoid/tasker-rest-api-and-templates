@@ -5,6 +5,7 @@ from django.db.models import Q, Count
 from django.shortcuts import render, redirect
 from .forms import TaskForm, MarkForm, AddUserForm
 from .models import TaskInfo, MainTaskBoard, AdvancedUser, Mark
+from .utilities import send_user_registration_notification
 
 
 def month_days():
@@ -38,17 +39,36 @@ def main_board(request):
         Еженедельные=Count('pk', filter=Q(t_duration='7')),
         Долгосрочные=Count('pk', filter=Q(t_duration='30')),
     )
-    if request.method == 'POST':
+
+    for item in request.POST:
+        print(item)
+    if request.method == 'POST' and 'main_board' in request.POST:
         form = TaskForm(request.POST)
         if form.is_valid():
             form.save()
             messages.add_message(request, messages.SUCCESS,
-                                 'Новая задача добавлена')
+                                 'New task successfully added')
             return redirect('main:main_board')
         else:
             messages.add_message(request, messages.ERROR,
-                                 'Какой то косяк. Сделай все как надо')
+                                 'Ops, new task not added.'
+                                 'Something goes wrong. Please do all right.')
             return redirect('main:main_board')
+
+    if request.method == 'POST' and 'email' in request.POST:
+        adduser_form = AddUserForm(request.POST)
+
+        if adduser_form.is_valid():
+            print(1)
+            messages.add_message(request, messages.SUCCESS,
+                             f'Invite sent to your friend {adduser_form.cleaned_data["email"]} email')
+            return redirect('main:main_board')
+        else:
+            print(0)
+            messages.add_message(request, messages.ERROR,
+                             f'Invite didn\'t send to your friend  {adduser_form.cleaned_data["email"]} email')
+            return redirect('main:main_board')
+        # send_user_registration_notification()
     else:
         form = TaskForm(initial={'author': request.user.pk, 'main_board': main_board})
         mark_form = MarkForm()
