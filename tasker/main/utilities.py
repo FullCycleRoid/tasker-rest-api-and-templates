@@ -5,6 +5,8 @@ from django.template.loader import render_to_string
 
 signer = Signer()
 
+def new_function():
+    pass
 
 def send_user_registration_notification(user):
     if ALLOWED_HOSTS:
