@@ -1,5 +1,5 @@
 import datetime
-from django.contrib.auth.models import  AbstractUser
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
@@ -49,11 +49,12 @@ class TaskInfo(models.Model):
     author = models.ForeignKey(AdvancedUser, on_delete=models.CASCADE, verbose_name='Автор')
     t_duration = models.CharField(choices=duration, max_length=10, verbose_name='Длительность')
     created_at = models.DateField(editable=False, verbose_name='Создано')
+    visible = models.BooleanField(default=True, verbose_name='Кто видит задачу? Только я/Все')
 
     class Meta:
         verbose_name = 'Задача'
         verbose_name_plural = 'Задачи'
-        ordering = ['author', 't_duration' ]
+        ordering = ['author', 't_duration']
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -66,9 +67,9 @@ class TaskInfo(models.Model):
 
 class Mark(models.Model):
     status = (
-         ('done', 'done'),
-         ('undone', 'undone'),
-         ('in_progress', 'in_progress')
+        ('done', 'done'),
+        ('undone', 'undone'),
+        ('in_progress', 'in_progress')
     )
 
     task_info = models.ForeignKey(TaskInfo, on_delete=models.CASCADE)
@@ -95,3 +96,16 @@ class Mark(models.Model):
 
     def __str__(self):
         return f'{self.task_info.name}-{self.created_at}'
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(AdvancedUser, on_delete=models.CASCADE)
+    task = models.ForeignKey(TaskInfo, on_delete=models.CASCADE)
+    name = models.TextField(max_length=500, verbose_name='Имя')
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
+    def __str__(self):
+        return self.name

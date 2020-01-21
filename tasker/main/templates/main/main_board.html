@@ -4,41 +4,64 @@
 {% load task_length %}
 {% block title %} Main board {% endblock %}
 
+
 {% block content %}
 
-    {% for usr in board_users %}
+<header>
+    <div class="inline">
+        {% bootstrap_form adduser_form layout='horizontal' %}
+        {% buttons submit='Добавить участника' %}{% endbuttons %}
+    </div>
+</header>
 
+
+<section class="col border ру-2">
+        {% bootstrap_messages %}
+</section>
+
+
+    {% for usr in board_users %}
     <h3>{{ usr.username }}</h3>
     <table class="table">
             <tr>
                 <th>Продолжительность</th><th>Задачи</th>
                 {% for day in days %}
-                <td>{{ day }}</td>
+                <td>{{ day|date:'d' }}</td>
                 {% endfor %}
             </tr>
 
-        {% for task in usr.taskinfo_set.all %}
-        {% if task.t_duration != '1000'%}
-            <tr>
-                <th rowspan="" class="">{{ task.get_t_duration_display }}</th>
 
-                <th>{{ task }}</th>
-                {% for day in days %}
-                {% for mark in task.mark_set.all%}
-                {% if day|slugify == mark.created_at|date:'d' %}
-                <td class="undone">
-                    <form method="post">
-                        
-                    </form>
-                </td>
-                {% else %}
-                <td class="none"></td>
-                {% endif %}
-                {% endfor %}
-                {% endfor %}
-            </tr>
+        {% for task in utasks %}
+        {% if usr == task.author %}
+            {% if task.t_duration != '1000'%}
+                <tr>
+                    <th>{{ task.get_t_duration_display }}</th>
+
+                    <th>{{ task }}</th>
+                    {% for day in days %}
+                                {% if not task.mark_set.all %}
+                                <td class="none"></td>
+                                {% endif %}
+                        {% for mark in task.mark_set.all%}
+                                {% if day|date:'d' == mark.created_at|date:'d' %}
+                                <td class="{{ mark.t_status }}">
+
+
+                                </td>
+                                {% elif day|date:'d' > task.crated_at|date:'d' %}
+                                <td class="none"></td>
+                                {% else %}
+                                <form method="POST">
+                                    {% bootstrap_form mark_form layout='horizontal'%}
+                                </form>
+                                {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </tr>
+            {% endif %}
         {% endif %}
         {% endfor %}
+
 
         {% if user.is_authenticated and usr.username == user.username  %}
         <tr>
@@ -46,7 +69,7 @@
             Добавить задачу
             <form method="post">
                 {% csrf_token %}
-                {% bootstrap_form form layout='vertical'%}
+                {% bootstrap_form form layout='vertical' %}
                 {% buttons submit='Добавить'%}{% endbuttons %}
             </form>
             </th>
@@ -54,4 +77,5 @@
         {% endif %}
     </table>
     {% endfor %}
+
 {% endblock %}
