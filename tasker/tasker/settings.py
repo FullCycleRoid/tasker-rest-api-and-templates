@@ -133,6 +133,18 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
+
+# EMAIL SETTINGS
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'rubymazeroid@gmail.com'
+EMAIL_HOST_PASSWORD = '4we3wd4d'
+DEFAULT_FROM_EMAIL = 'Task Board'
+DEFAULT_TO_EMAIL = 'rubymazeroid@gmail.com'
+
+
+# Cron Settings
 CRONJOBS = [
     ('*/1 * * * *', 'tasker.cron.my_scheduled_job'),
     ('*/1 * * * *', 'main.cron.my_scheduled_job'),

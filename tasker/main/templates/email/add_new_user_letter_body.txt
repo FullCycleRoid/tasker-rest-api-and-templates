@@ -1,0 +1,11 @@
+Super Hi!
+
+Your friend {{ invited_by }} invited you to join to the Tasker Board App.
+
+Follow the link and enjoy.
+
+{{ host }}{% url 'main:invited_user_registration' %}
+board_pk=board_pk invited_by=invited_by
+
+Do your best, get new habits, manage your time and compete with your friends.
+Bye!

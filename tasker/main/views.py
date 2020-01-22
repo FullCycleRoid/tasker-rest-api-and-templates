@@ -3,9 +3,12 @@ import calendar
 from django.contrib import messages
 from django.db.models import Q, Count
 from django.shortcuts import render, redirect
+from django.views import View
+from django.views.generic import TemplateView
+
 from .forms import TaskForm, MarkForm, AddUserForm
-from .models import TaskInfo, MainTaskBoard, AdvancedUser, Mark
-from .utilities import send_user_registration_notification
+from .models import TaskInfo, MainTaskBoard, AdvancedUser
+from .utilities import send_invite_notification
 
 
 def month_days():
@@ -30,6 +33,7 @@ def main_board(request):
     user_bord_pk = AdvancedUser.objects.get(pk=request.user.pk).board.pk
     main_board = MainTaskBoard.objects.get(pk=user_bord_pk)
     board_users = main_board.advanceduser_set.all()
+    invited_by = request.user.username
 
     tasks = TaskInfo.objects.filter(author__in=board_users). \
         extra(select={'t_duration': 'CAST(t_duration AS INTEGER)'}).order_by('t_duration')
@@ -42,6 +46,7 @@ def main_board(request):
 
     for item in request.POST:
         print(item)
+
     if request.method == 'POST' and 'main_board' in request.POST:
         form = TaskForm(request.POST)
         if form.is_valid():
@@ -59,16 +64,18 @@ def main_board(request):
         adduser_form = AddUserForm(request.POST)
 
         if adduser_form.is_valid():
-            print(1)
             messages.add_message(request, messages.SUCCESS,
-                             f'Invite sent to your friend {adduser_form.cleaned_data["email"]} email')
+                                 f'Invite sent to your friend {adduser_form.cleaned_data["email"]} email')
+
+            send_invite_notification(adduser_form.cleaned_data['email'], main_board.pk, invited_by)
             return redirect('main:main_board')
+
         else:
-            print(0)
             messages.add_message(request, messages.ERROR,
-                             f'Invite didn\'t send to your friend  {adduser_form.cleaned_data["email"]} email')
+                                 f'Invite didn\'t send to your friend  {adduser_form.cleaned_data["email"]} email')
+
             return redirect('main:main_board')
-        # send_user_registration_notification()
+
     else:
         form = TaskForm(initial={'author': request.user.pk, 'main_board': main_board})
         mark_form = MarkForm()
@@ -79,3 +86,8 @@ def main_board(request):
                'mark_form': mark_form, 'adduser_form': adduser_form}
 
     return render(request, 'main/main_board.html', context)
+
+
+class RegView(TemplateView):
+    template_name = 'main/invited_user_registration.html'
+

@@ -1,21 +1,22 @@
-from tasker.settings import ALLOWED_HOSTS
-from django.core.signing import Signer
+from django.core.mail import send_mail
+from tasker.settings import ALLOWED_HOSTS, DEFAULT_TO_EMAIL
 from django.template.loader import render_to_string
 
 
-signer = Signer()
-
-def send_user_registration_notification(user):
+def send_invite_notification(recipient_email, your_board_pk, invited_by):
     if ALLOWED_HOSTS:
         host = 'http://' + ALLOWED_HOSTS[0]
     else:
         host = 'http://localhost:8000'
 
-    context = {'user': user, 'host': host,
-               'sign': signer.sign(user.username)}
+    context = {'user': recipient_email, 'host': host,
+               'board_pk': your_board_pk, 'invited_by': invited_by,
+               'recipient_email': recipient_email}
 
-    subject = render_to_string('main/add_new_user_letter_subject.txt',
+    subject = render_to_string('email/add_new_user_letter_subject.txt',
                                context)
-    body_text = render_to_string('main/add_new_user_letter_body.txt',
+    body_text = render_to_string('email/add_new_user_letter_body.txt',
                                  context)
-    user.email_user(subject, body_text)
+
+    send_mail(subject, body_text, DEFAULT_TO_EMAIL, [recipient_email,])
+
