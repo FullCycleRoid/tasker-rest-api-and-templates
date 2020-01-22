@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.db.models import Q, Count
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DetailView
 
 from .forms import TaskForm, MarkForm, AddUserForm
 from .models import TaskInfo, MainTaskBoard, AdvancedUser
@@ -91,3 +91,7 @@ def main_board(request):
 class RegView(TemplateView):
     template_name = 'main/invited_user_registration.html'
 
+
+class TaskDetail(DetailView):
+    model = TaskInfo
+    template_name = 'main/detail_task.html'

@@ -39,8 +39,7 @@
             {% if task.t_duration != '1000'%}
                 <tr>
                     <th>{{ task.get_t_duration_display }}</th>
-
-                    <th>{{ task }}</th>
+                    <th><a href="{% url 'main:detail' pk=task.pk %}">{{ task }}</a></th>
                     {% for day in days %}
                                 {% if not task.mark_set.all %}
                                 <td class="none"></td>
