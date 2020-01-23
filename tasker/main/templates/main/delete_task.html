@@ -15,11 +15,12 @@
             {% bootstrap_form form layout='horizontal' %}
             {% buttons submit='Обновить' %}{% endbuttons %}
         </form>
-
-    <a class="right" href="{% url 'main:delete' pk=object.pk %}">
-    <button class="btn btn-large btn-danger">Delete</button>
-    </a>
     </div>
+
+    <a href="{% url 'main:delete' pk=object.pk %}">
+    <button class="btn btn-warning">Delete</button>
+    </a>
+
 
     {% else %}
     <p>{{ object.author }}</p>
@@ -28,7 +29,5 @@
     <p>{{ objects.t_duration }}</p>
 
     {% endif %}
-
-
 
 {% endblock %}

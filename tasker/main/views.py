@@ -4,9 +4,9 @@ from django.contrib import messages
 from django.db.models import Q, Count
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import TemplateView, DetailView
+from django.views.generic import TemplateView, DetailView, UpdateView, DeleteView
 
-from .forms import TaskForm, MarkForm, AddUserForm
+from .forms import TaskForm, MarkForm, AddUserForm, TaskDetailForm
 from .models import TaskInfo, MainTaskBoard, AdvancedUser
 from .utilities import send_invite_notification
 
@@ -35,8 +35,7 @@ def main_board(request):
     board_users = main_board.advanceduser_set.all()
     invited_by = request.user.username
 
-    tasks = TaskInfo.objects.filter(author__in=board_users). \
-        extra(select={'t_duration': 'CAST(t_duration AS INTEGER)'}).order_by('t_duration')
+    tasks = TaskInfo.objects.filter(author__in=board_users)
 
     user_count_tasks = TaskInfo.objects.filter(author__in=board_users).aggregate(
         Ежедневные=Count('pk', filter=Q(t_duration='1')),
@@ -92,6 +91,13 @@ class RegView(TemplateView):
     template_name = 'main/invited_user_registration.html'
 
 
-class TaskDetail(DetailView):
+class TaskDetail(DetailView, UpdateView):
     model = TaskInfo
     template_name = 'main/detail_task.html'
+    form_class = TaskDetailForm
+
+
+class DeleteTaskView(DeleteView):
+    model = TaskInfo
+    template_name = 'main/delete_task.html'
+

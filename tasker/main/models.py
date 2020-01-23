@@ -1,6 +1,8 @@
 import datetime
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils import timezone
 
 
@@ -13,7 +15,7 @@ class AdvancedUser(AbstractUser):
                                        verbose_name='Прошел активацию')
     send_messages = models.BooleanField(default=True,
                                         verbose_name='Слать оповещения о новых комментариях?')
-    board = models.ForeignKey('MainTaskBoard', on_delete=models.CASCADE, blank=True)
+    board = models.ForeignKey('MainTaskBoard', on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta(AbstractUser.Meta):
         pass
@@ -63,6 +65,9 @@ class TaskInfo(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('main:detail', kwargs={'pk': self.pk})
 
 
 class Mark(models.Model):
