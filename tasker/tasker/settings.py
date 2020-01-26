@@ -156,4 +156,9 @@ CRONJOBS = [
     ('1 * * * *', 'tasker.cron.my_scheduled_job'),
 ]
 
+
 AUTH_USER_MODEL = 'main.AdvancedUser'
+
+
+LOGIN_URL  = 'signin/'
+LOGOUT_URL = 'signout/'

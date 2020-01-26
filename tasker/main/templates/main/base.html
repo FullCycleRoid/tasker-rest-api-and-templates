@@ -34,19 +34,21 @@
                             <a class="nav-link" href="#">Registration</a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" href="#">LogIn</a>
+                            <a class="nav-link" href="{% url 'main:signin' %}">SignIn</a>
                           </li>
                           {% else %}
                           <li class="nav-item">
                             <a class="nav-link" href="#">My Account</a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link" href="#">LogOut</a>
+                            <a class="nav-link" href="{% url 'main:signout' %}">SignOut</a>
                           </li>
                           {% endif %}
                       </ul>
                   </div>
                </nav>
+
+
   <main class="container-fluid">
       {% block content %}
 

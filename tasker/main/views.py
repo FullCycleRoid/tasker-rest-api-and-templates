@@ -1,8 +1,9 @@
 import datetime
 import calendar
 from django.contrib import messages
+from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Q, Count
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import TemplateView, DetailView, UpdateView, DeleteView
 
@@ -30,10 +31,17 @@ def current_month_days():
 
 
 def main_board(request):
-    user_bord_pk = AdvancedUser.objects.get(pk=request.user.pk).board.pk
-    main_board = MainTaskBoard.objects.get(pk=user_bord_pk)
+
+
+    if not request.user.is_authenticated:
+        main_board = get_object_or_404(MainTaskBoard, pk=1)
+    else:
+        user_bord_pk = AdvancedUser.objects.get(pk=request.user.pk).board.pk
+        main_board = MainTaskBoard.objects.get(pk=user_bord_pk)
+        invited_by = request.user.username
+
     board_users = main_board.advanceduser_set.all()
-    invited_by = request.user.username
+
 
     tasks = TaskInfo.objects.filter(author__in=board_users)
 
@@ -76,6 +84,7 @@ def main_board(request):
             return redirect('main:main_board')
 
     else:
+
         form = TaskForm(initial={'author': request.user.pk, 'main_board': main_board})
         mark_form = MarkForm()
         adduser_form = AddUserForm()
@@ -102,3 +111,10 @@ class DeleteTaskView(DeleteView):
     template_name = 'main/delete_task.html'
     success_url = '/'
 
+
+class MyLoginView(LoginView):
+    template_name = 'main/login.html'
+
+
+class MyLogoutView(LogoutView):
+    template_name = 'main/logout.html'
