@@ -79,9 +79,9 @@ WSGI_APPLICATION = 'tasker.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_db2',
-        'USER': 'admin2',
-        'PASSWORD': '4we3wd4d',
+        'NAME': 'django_db10',
+        'USER': 'user_name',
+        'PASSWORD': 'postgres',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }

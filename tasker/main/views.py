@@ -100,4 +100,5 @@ class TaskDetail(DetailView, UpdateView):
 class DeleteTaskView(DeleteView):
     model = TaskInfo
     template_name = 'main/delete_task.html'
+    success_url = '/'
 

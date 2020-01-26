@@ -17,8 +17,6 @@ class AdvancedUser(AbstractUser):
                                         verbose_name='Слать оповещения о новых комментариях?')
     board = models.ForeignKey('MainTaskBoard', on_delete=models.CASCADE, blank=True, null=True)
 
-    class Meta(AbstractUser.Meta):
-        pass
 
 
 # TASKBOARD SECTION
@@ -39,10 +37,10 @@ class MainTaskBoard(models.Model):
 
 class TaskInfo(models.Model):
     duration = {
-        ('1000', 'Бессрочные'),
+        ('9000', 'Бессрочные'),
         ('1', 'Ежедневные'),
         ('7', 'Еженедельные'),
-        ('30', 'Долгосрочные')
+        ('80', 'Долгосрочные')
     }
 
     main_board = models.ForeignKey(MainTaskBoard, on_delete=models.CASCADE)
@@ -80,7 +78,6 @@ class Mark(models.Model):
     task_info = models.ForeignKey(TaskInfo, on_delete=models.CASCADE)
     t_status = models.CharField(choices=status, default=status[1], max_length=50)
     created_at = models.DateField(editable=False)
-    end_date = models.DateField(editable=False, verbose_name='Жизненный цикл')
 
     class Meta:
         verbose_name = 'Отметка'
@@ -89,14 +86,6 @@ class Mark(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.created_at = datetime.date.today()
-            if self.task_info.t_duration == '1':
-                self.end_date = datetime.date.today() + datetime.timedelta(days=1)
-            elif self.task_info.t_duration == '0':
-                self.end_date = datetime.date.today() + datetime.timedelta(days=0)
-            elif self.task_info.t_duration == '7':
-                self.end_date = datetime.date.today() + datetime.timedelta(days=7)
-            else:
-                self.end_date = datetime.date.today() + datetime.timedelta(days=31)
         return super().save(*args, **kwargs)
 
     def __str__(self):

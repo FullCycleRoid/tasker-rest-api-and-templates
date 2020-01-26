@@ -7,16 +7,13 @@
 
 {% block content %}
 
-<header>
-    <div class="inline">
+<div>
         <form method="POST">
             {% csrf_token %}
-            {% bootstrap_form adduser_form layout='horizontal' %}
+            {% bootstrap_form adduser_form layout='inline' %}
             {% buttons submit='add new user' %}{% endbuttons %}
         </form>
-    </div>
-</header>
-
+</div>
 
 <section class="col border ру-2">
         {% bootstrap_messages %}
