@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from django.urls import path
-from main.views import main_board, TaskDetail, RegView, DeleteTaskView, MyLoginView, MyLogoutView
+from main.views import main_board, TaskDetail, RegView, DeleteTaskView, MyLoginView, MyLogoutView,RegistrationView
 
 
 app_name = 'main'
@@ -12,6 +12,7 @@ urlpatterns = [
     path('delete/<int:pk>', DeleteTaskView.as_view(), name='delete'),
     path('signin/', MyLoginView.as_view(), name='signin'),
     path('signout/', MyLogoutView.as_view(), name='signout'),
+    path('registration/', RegistrationView.as_view(), name='registration'),
     url('', main_board, name='main_board'),
 ]
 

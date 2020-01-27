@@ -5,7 +5,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Q, Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from django.views.generic import TemplateView, DetailView, UpdateView, DeleteView
+from django.views.generic import TemplateView, DetailView, UpdateView, DeleteView, CreateView
 
 from .forms import TaskForm, MarkForm, AddUserForm, TaskDetailForm
 from .models import TaskInfo, MainTaskBoard, AdvancedUser
@@ -118,3 +118,7 @@ class MyLoginView(LoginView):
 
 class MyLogoutView(LogoutView):
     template_name = 'main/logout.html'
+
+
+class RegistrationView(CreateView):
+    pass
