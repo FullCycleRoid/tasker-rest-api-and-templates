@@ -1,15 +1,11 @@
 import datetime
-
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
-from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
 
 
 # USER SECTION
-class AdvancedUserManager(models.Manager):
+class AdvancedUserManager(BaseUserManager):
 
     def create_user(self, email, password=None, **extra_fields):
         """ Creates and saves a new user"""
@@ -31,6 +27,7 @@ class AdvancedUserManager(models.Manager):
 
 class AdvancedUser(AbstractBaseUser):
     """User additional information"""
+    objects = AdvancedUserManager()
 
     email = models.EmailField(max_length=50, unique=True)
     name = models.CharField(max_length=50)
@@ -45,9 +42,8 @@ class AdvancedUser(AbstractBaseUser):
                                         verbose_name='Слать оповещения о новых комментариях?')
     board = models.ForeignKey('MainTaskBoard', on_delete=models.CASCADE, blank=True, null=True)
 
-    objects = AdvancedUserManager()
-
     USERNAME_FIELD = 'email'
+
 
 
 # TASK BOARD SECTION

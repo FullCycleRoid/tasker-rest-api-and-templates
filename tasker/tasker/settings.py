@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'bootstrap4',
     'main',
     'django_crontab',
+    'api',
+    'django_extensions',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -79,9 +82,9 @@ WSGI_APPLICATION = 'tasker.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_db10',
-        'USER': 'user_name',
-        'PASSWORD': 'postgres',
+        'NAME': 'django_db20',
+        'USER': 'postgres',
+        'PASSWORD': '4we3wd4d',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
@@ -156,9 +159,7 @@ CRONJOBS = [
     ('1 * * * *', 'tasker.cron.my_scheduled_job'),
 ]
 
-
 AUTH_USER_MODEL = 'main.AdvancedUser'
-
 
 LOGIN_URL  = 'signin/'
 LOGOUT_URL = 'signout/'
