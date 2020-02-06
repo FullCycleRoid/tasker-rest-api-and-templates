@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from main.models import TaskInfo
+
 
 class UserSerializers(serializers.ModelSerializer):
     """Serializer for the user objects"""
@@ -25,3 +27,11 @@ class UserSerializers(serializers.ModelSerializer):
                 user.save()
 
             return user
+
+
+class TaskSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = TaskInfo
+        fields = ['main_board', 'name', 'description', 'author', 't_duration',
+                  'created_at', 'visible']
