@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-
-from main.models import TaskInfo
+from main.models import TaskInfo, MainTaskBoard, AdvancedUser
 
 
 class UserSerializers(serializers.ModelSerializer):
@@ -29,9 +28,25 @@ class UserSerializers(serializers.ModelSerializer):
             return user
 
 
-class TaskSerializers(serializers.ModelSerializer):
+class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskInfo
-        fields = ['main_board', 'name', 'description', 'author', 't_duration',
-                  'created_at', 'visible']
+        fields = ['name', 'author']
+
+
+class TaskDetailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TaskInfo
+        fields = ['main_board', 'name', 'author', 'description',
+                  't_duration', 'created_at', 'author']
+
+
+class MainBoardSerializer(serializers.ModelSerializer):
+    creator = serializers.PrimaryKeyRelatedField(queryset=AdvancedUser.objects.all())
+
+
+    class Meta:
+        model = MainTaskBoard
+        fields = ['board_name', 'creator', 'created_at']

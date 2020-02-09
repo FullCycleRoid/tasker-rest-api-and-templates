@@ -64,6 +64,7 @@ class AdvancedUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+
 # TASK BOARD SECTION
 class MainTaskBoard(models.Model):
     board_name = models.CharField(max_length=50, verbose_name='Назови доску задач', default='Task board')
@@ -78,6 +79,9 @@ class MainTaskBoard(models.Model):
         if not self.pk:
             self.created_at = datetime.date.today()
         return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.board_name
 
 
 class TaskInfo(models.Model):

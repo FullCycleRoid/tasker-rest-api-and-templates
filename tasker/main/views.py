@@ -32,27 +32,14 @@ def current_month_days():
 
 def main_board(request):
 
-
     if not request.user.is_authenticated:
         main_board = get_object_or_404(MainTaskBoard, pk=1)
     else:
         user_bord_pk = AdvancedUser.objects.get(pk=request.user.pk).board.pk
         main_board = MainTaskBoard.objects.get(pk=user_bord_pk)
-        invited_by = request.user.username
 
     board_users = main_board.advanceduser_set.all()
-
-
     tasks = TaskInfo.objects.filter(author__in=board_users)
-
-    user_count_tasks = TaskInfo.objects.filter(author__in=board_users).aggregate(
-        Ежедневные=Count('pk', filter=Q(t_duration='1')),
-        Еженедельные=Count('pk', filter=Q(t_duration='7')),
-        Долгосрочные=Count('pk', filter=Q(t_duration='30')),
-    )
-
-    for item in request.POST:
-        print(item)
 
     if request.method == 'POST' and 'main_board' in request.POST:
         form = TaskForm(request.POST)
@@ -74,7 +61,7 @@ def main_board(request):
             messages.add_message(request, messages.SUCCESS,
                                  f'Invite sent to your friend {adduser_form.cleaned_data["email"]} email')
 
-            send_invite_notification(adduser_form.cleaned_data['email'], main_board.pk, invited_by)
+            send_invite_notification(adduser_form.cleaned_data['email'], main_board.pk)
             return redirect('main:main_board')
 
         else:
@@ -90,7 +77,7 @@ def main_board(request):
         adduser_form = AddUserForm()
 
     context = {'board_users': board_users, 'main_board': main_board, 'month': month_days(),
-               'days': current_month_days, 'utasks': tasks, 'form': form, 'user_count_tasks': user_count_tasks,
+               'days': current_month_days, 'utasks': tasks, 'form': form,
                'mark_form': mark_form, 'adduser_form': adduser_form}
 
     return render(request, 'main/main_board.html', context)
