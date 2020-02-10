@@ -1,0 +1,19 @@
+{% extends 'main/base.html' %}
+
+{% load bootstrap4 %}
+{% load task_length %}
+{% block title %} Main board {% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+    <h2> Create Your First Task Board </h2>
+    <form method="post">{% csrf_token %}
+        {% bootstrap_form form layout='horizontal' %}
+        <input type="submit" value="Create">
+    </form>
+
+</div>
+
+{% endblock %}

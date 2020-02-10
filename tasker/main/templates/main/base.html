@@ -31,14 +31,14 @@
                           </li>
                           {% if not user.is_authenticated %}
                           <li class="nav-item">
-                            <a class="nav-link" href="#">Registration</a>
+                            <a class="nav-link" href="{% url 'main:registration' %}">Registration</a>
                           </li>
                           <li class="nav-item">
                             <a class="nav-link" href="{% url 'main:signin' %}">SignIn</a>
                           </li>
                           {% else %}
                           <li class="nav-item">
-                            <a class="nav-link" href="#">My Account</a>
+                            <a class="nav-link" href="{% url 'main:account'%}">My Account</a>
                           </li>
                           <li class="nav-item">
                             <a class="nav-link" href="{% url 'main:signout' %}">SignOut</a>

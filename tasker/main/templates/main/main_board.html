@@ -29,10 +29,9 @@
                 <td>{{ day|date:'d' }}</td>
                 {% endfor %}
             </tr>
-
         {% regroup utasks by get_t_duration_display as duration_list %}
             {% for duration in duration_list %}
-            <tr><th>{{ duration.grouper }}</th></tr>
+            <tr><th colspan="{{month|add:'1'}}">{{ duration.grouper }}</th></tr>
 
                 {% for task in duration.list %}
                 {% if usr == task.author %}

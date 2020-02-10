@@ -1,13 +1,15 @@
 import datetime
 import calendar
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.db.models import Q, Count
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.utils import IntegrityError
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.views.generic import TemplateView, DetailView, UpdateView, DeleteView, CreateView
+from django.views.generic import UpdateView, DetailView, TemplateView, DeleteView, CreateView
 
-from .forms import TaskForm, MarkForm, AddUserForm, TaskDetailForm
+from .forms import TaskForm, MarkForm, AddUserForm, TaskDetailForm, RegistrationForm, CustomUserChangeForm
 from .models import TaskInfo, MainTaskBoard, AdvancedUser
 from .utilities import send_invite_notification
 
@@ -29,17 +31,21 @@ def current_month_days():
         days += 1
     return date_list
 
+class UnregistredBoardVew():
+    pass
 
+@login_required()
 def main_board(request):
+    try:
+        main_board = MainTaskBoard.objects.get(creator=request.user)
 
-    if not request.user.is_authenticated:
-        main_board = get_object_or_404(MainTaskBoard, pk=1)
-    else:
-        user_bord_pk = AdvancedUser.objects.get(pk=request.user.pk).board.pk
-        main_board = MainTaskBoard.objects.get(pk=user_bord_pk)
+        board_users = [user for user in main_board.member.all()]
+        board_users.insert(0, main_board.creator)
 
-    board_users = main_board.advanceduser_set.all()
-    tasks = TaskInfo.objects.filter(author__in=board_users)
+        board_users_id = [user.id for user in board_users]
+        tasks = TaskInfo.objects.filter(author__in=board_users_id)
+    except ObjectDoesNotExist:
+        return redirect('main:create_board')
 
     if request.method == 'POST' and 'main_board' in request.POST:
         form = TaskForm(request.POST)
@@ -73,12 +79,11 @@ def main_board(request):
     else:
 
         form = TaskForm(initial={'author': request.user.pk, 'main_board': main_board})
-        mark_form = MarkForm()
+        mark_form    = MarkForm()
         adduser_form = AddUserForm()
 
-    context = {'board_users': board_users, 'main_board': main_board, 'month': month_days(),
-               'days': current_month_days, 'utasks': tasks, 'form': form,
-               'mark_form': mark_form, 'adduser_form': adduser_form}
+    context = {'board_users': board_users, 'main_board': main_board, 'month': month_days(), 'days': current_month_days,
+               'utasks': tasks, 'form': form, 'mark_form': mark_form, 'adduser_form': adduser_form}
 
     return render(request, 'main/main_board.html', context)
 
@@ -88,15 +93,15 @@ class RegView(TemplateView):
 
 
 class TaskDetail(DetailView, UpdateView):
-    model = TaskInfo
+    model         = TaskInfo
     template_name = 'main/detail_task.html'
-    form_class = TaskDetailForm
+    form_class    = TaskDetailForm
 
 
 class DeleteTaskView(DeleteView):
     model = TaskInfo
     template_name = 'main/delete_task.html'
-    success_url = '/'
+    success_url   = '/'
 
 
 class MyLoginView(LoginView):
@@ -108,4 +113,33 @@ class MyLogoutView(LogoutView):
 
 
 class RegistrationView(CreateView):
-    pass
+    model         = AdvancedUser
+    form_class    = RegistrationForm
+    template_name = 'main/registration.html'
+    success_url   = '/'
+
+
+class CreateBoardView(LoginRequiredMixin, CreateView):
+    model         = MainTaskBoard
+    template_name = 'main/create_board.html'
+    fields = ('board_name', )
+    success_url = '/'
+
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save(commit=False)
+            self.object.creator = self.request.user
+            return super(CreateBoardView, self).form_valid(form)
+        except IntegrityError:
+            return redirect('main:main_board')
+
+
+class AccountUpdateView(LoginRequiredMixin, UpdateView):
+    model = AdvancedUser
+    form_class = CustomUserChangeForm
+    template_name = 'main/account.html'
+
+    def get_object(self, queryset=None):
+        obj = AdvancedUser.objects.filter(pk=self.request.user.pk).first()
+        return obj

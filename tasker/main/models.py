@@ -38,7 +38,6 @@ class AdvancedUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-
 class AdvancedUser(AbstractBaseUser, PermissionsMixin):
     """User additional information"""
 
@@ -47,15 +46,15 @@ class AdvancedUser(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, blank=True, null=True)
 
     profile_image = models.ImageField(upload_to='user/profile_image', default='img/default_image.jpg')
     # is_activated = models.BooleanField(default=True, db_index=True,
     #                                    verbose_name='Прошел активацию')
     # send_messages = models.BooleanField(default=True,
     #                                     verbose_name='Слать оповещения о новых комментариях?')
-    board = models.ForeignKey('MainTaskBoard', on_delete=models.CASCADE, blank=True, null=True)
 
+    board = models.ForeignKey('MainTaskBoard', on_delete=models.CASCADE, blank=True, null=True, related_name='member')
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -67,9 +66,9 @@ class AdvancedUser(AbstractBaseUser, PermissionsMixin):
 
 # TASK BOARD SECTION
 class MainTaskBoard(models.Model):
-    board_name = models.CharField(max_length=50, verbose_name='Назови доску задач', default='Task board')
-    creator = models.OneToOneField(AdvancedUser, on_delete=models.CASCADE, verbose_name='Автор')
-    created_at = models.DateField(editable=False, verbose_name='Создано')
+    board_name = models.CharField(max_length=50, verbose_name='Board Name')
+    creator = models.OneToOneField(AdvancedUser, on_delete=models.CASCADE)
+    created_at = models.DateField(editable=False, verbose_name='Creates')
 
     class Meta:
         verbose_name = 'Доска задач'
