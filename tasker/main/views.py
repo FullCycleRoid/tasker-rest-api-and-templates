@@ -68,7 +68,7 @@ def main_board(request):
                                  f'Invite sent to your friend {adduser_form.cleaned_data["email"]} email')
 
             send_invite_notification(adduser_form.cleaned_data['email'], main_board.pk)
-            return redirect('main:main_board')
+            return redirect('main:invite_friend')
 
         else:
             messages.add_message(request, messages.ERROR,
@@ -89,7 +89,7 @@ def main_board(request):
 
 
 class RegView(TemplateView):
-    template_name = 'main/invited_user_registration.html'
+    template_name = 'main/send_invite_notification.html'
 
 
 class TaskDetail(DetailView, UpdateView):
@@ -143,3 +143,7 @@ class AccountUpdateView(LoginRequiredMixin, UpdateView):
     def get_object(self, queryset=None):
         obj = AdvancedUser.objects.filter(pk=self.request.user.pk).first()
         return obj
+
+
+class InvitedUserRegistration(CreateView):
+    model         = AdvancedUser
