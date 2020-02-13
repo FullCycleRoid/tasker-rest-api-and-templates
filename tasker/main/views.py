@@ -9,7 +9,8 @@ from django.db.utils import IntegrityError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import UpdateView, DetailView, TemplateView, DeleteView, CreateView
 
-from .forms import TaskForm, MarkForm, AddUserForm, TaskDetailForm, RegistrationForm, CustomUserChangeForm
+from .forms import TaskForm, MarkForm, AddUserForm, TaskDetailForm, RegistrationForm, CustomUserChangeForm, \
+    InvitedUserCreationForm
 from .models import TaskInfo, MainTaskBoard, AdvancedUser
 from .utilities import send_invite_notification
 
@@ -31,8 +32,10 @@ def current_month_days():
         days += 1
     return date_list
 
+
 class UnregistredBoardVew():
     pass
+
 
 @login_required()
 def main_board(request):
@@ -79,7 +82,7 @@ def main_board(request):
     else:
 
         form = TaskForm(initial={'author': request.user.pk, 'main_board': main_board})
-        mark_form    = MarkForm()
+        mark_form = MarkForm()
         adduser_form = AddUserForm()
 
     context = {'board_users': board_users, 'main_board': main_board, 'month': month_days(), 'days': current_month_days,
@@ -93,15 +96,15 @@ class RegView(TemplateView):
 
 
 class TaskDetail(DetailView, UpdateView):
-    model         = TaskInfo
+    model = TaskInfo
     template_name = 'main/detail_task.html'
-    form_class    = TaskDetailForm
+    form_class = TaskDetailForm
 
 
 class DeleteTaskView(DeleteView):
     model = TaskInfo
     template_name = 'main/delete_task.html'
-    success_url   = '/'
+    success_url = '/'
 
 
 class MyLoginView(LoginView):
@@ -113,18 +116,17 @@ class MyLogoutView(LogoutView):
 
 
 class RegistrationView(CreateView):
-    model         = AdvancedUser
-    form_class    = RegistrationForm
+    model = AdvancedUser
+    form_class = RegistrationForm
     template_name = 'main/registration.html'
-    success_url   = '/'
+    success_url = '/'
 
 
 class CreateBoardView(LoginRequiredMixin, CreateView):
-    model         = MainTaskBoard
+    model = MainTaskBoard
     template_name = 'main/create_board.html'
-    fields = ('board_name', )
+    fields = ('board_name',)
     success_url = '/'
-
 
     def form_valid(self, form):
         try:
@@ -146,4 +148,33 @@ class AccountUpdateView(LoginRequiredMixin, UpdateView):
 
 
 class InvitedUserRegistration(CreateView):
-    model         = AdvancedUser
+    model = AdvancedUser
+    form_class = InvitedUserCreationForm
+    template_name = 'main/invite_registration.html'
+    success_url = '/'
+
+    def get_query_params(self):
+        url = self.request.build_absolute_uri()
+        split_url = url.split('?')[1]
+        return split_url
+
+    def get_email(self):
+        params = self.get_query_params()
+        email = params.split('email=')[1]
+        return email
+
+    def get_board(self):
+        params = self.get_query_params()
+        board = params.split('board_pk=')[1].split('&')[0]
+        obj = MainTaskBoard.objects.get(pk=board)
+        return obj
+
+    def get_initial(self):
+        self.initial['email'] = self.get_email()
+        self.initial['board'] = self.get_board()
+        print(self.initial)
+        return self.initial
+
+
+class RegistrationDone(TemplateView):
+    template_name = 'main/registration_done.html'
