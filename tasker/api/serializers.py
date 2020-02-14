@@ -3,7 +3,7 @@ from rest_framework import serializers
 from main.models import TaskInfo, MainTaskBoard, AdvancedUser
 
 
-class UserSerializers(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     """Serializer for the user objects"""
 
     class Meta:
@@ -44,8 +44,9 @@ class TaskDetailSerializer(serializers.ModelSerializer):
 
 
 class MainBoardSerializer(serializers.ModelSerializer):
-    creator = serializers.PrimaryKeyRelatedField(queryset=AdvancedUser.objects.all())
-
+    creator = serializers.PrimaryKeyRelatedField(queryset=AdvancedUser.objects.all(), many=True)
+    users = serializers.PrimaryKeyRelatedField(queryset=MainTaskBoard.member, many=True)
+    tasks = serializers.PrimaryKeyRelatedField(queryset=TaskInfo.objects.all(), many=True)
 
     class Meta:
         model = MainTaskBoard

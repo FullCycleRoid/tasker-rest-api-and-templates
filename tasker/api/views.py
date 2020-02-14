@@ -1,24 +1,33 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from rest_framework import status
-from rest_framework.generics import GenericAPIView, ListAPIView, CreateAPIView, RetrieveAPIView
-from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin
+from rest_framework.generics import GenericAPIView, ListAPIView, CreateAPIView, RetrieveAPIView, ListCreateAPIView, \
+    RetrieveUpdateDestroyAPIView, UpdateAPIView, RetrieveUpdateAPIView
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
 
-from .serializers import UserSerializers, TaskSerializer, TaskDetailSerializer, MainBoardSerializer
-from main.models import TaskInfo, MainTaskBoard
+from .serializers import TaskSerializer, TaskDetailSerializer, MainBoardSerializer, UserSerializer
+from main.models import TaskInfo, MainTaskBoard, AdvancedUser
 
 
-class UserAPIView(ListModelMixin, CreateModelMixin, GenericAPIView):
+class ListCreateUserAPIView(ListCreateAPIView):
     queryset = get_user_model().objects.all()
-    serializer_class = UserSerializers
+    serializer_class = UserSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+class UserViewSet(ListModelMixin,
+                 CreateModelMixin,
+                 RetrieveModelMixin,
+                 UpdateModelMixin,
+                 GenericViewSet):
 
+    queryset = get_user_model().objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminUser, ]
 
 class TaskAPIView(ListAPIView, CreateAPIView, RetrieveAPIView):
     queryset = TaskInfo.objects.all()
@@ -35,20 +44,10 @@ class TaskDetailAPIView(RetrieveAPIView):
     serializer_class = TaskDetailSerializer
 
 
-class MainBoardAPIView(GenericAPIView):
-    queryset = MainTaskBoard.objects.all()
-    serializer_class = MainBoardSerializer
-
-    def get(self, request, *args, **kwargs):
-        user = self.request.user
-        print(self.queryset[0])
-        if self.request.user.is_authenticated:
-            queryset = self.queryset.get(creator=user)
-            serializer = MainBoardSerializer(queryset)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            queryset = self.queryset[0]
-            serializer = MainBoardSerializer(queryset)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-
+@login_required()
+def main_board_representation_view(request):
+    board_data = {
+        'user': 'goo',
+        "boo": "noo"
+    }
+    return JsonResponse(board_data)
